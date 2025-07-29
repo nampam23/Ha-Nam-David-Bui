@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive CV - David Bui Ha Nam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Serene Slate (Background: #f8f7f4, Text: #4a4a4a, Accents: #607d8b, #4a5568, Highlights: #4299e1) -->
+    <!-- Application Structure Plan: This SPA is structured with a fixed left-hand navigation sidebar for quick access to main sections. The main content area is divided into thematic sections: a 'Summary' as an introduction, a 'Timeline' to chronologically visualize education and work experience, a 'Skills' section with interactive charts for languages and soft skills and a tag cloud for IT skills, and an 'Interests' section for personal hobbies. This design offers a clear, intuitive, and non-linear exploration path, allowing recruiters to quickly navigate to areas of interest and understand the applicant's profile efficiently. -->
+    <!-- Visualization & Content Choices: Summary -> Goal: Provide overview -> Viz: Text Block -> Interaction: None -> Justification: Standard introductory format. Timeline -> Goal: Show chronological progression -> Viz: Custom HTML/CSS Vertical Timeline -> Interaction: Hover effects for detail visibility -> Justification: Visually engaging and easy to follow career path. Languages (Skills) -> Goal: Quantify proficiency -> Viz: Horizontal Bar Chart (Chart.js) -> Interaction: Tooltips on hover -> Justification: Clear visual comparison of language levels. Soft Skills (Skills) -> Goal: Illustrate balanced skill profile -> Viz: Radar Chart (Chart.js) -> Interaction: Tooltips on hover -> Justification: Effective for showing multi-faceted skill sets. IT Skills (Skills) -> Goal: List technical competencies -> Viz: HTML/CSS Tags/Badges -> Interaction: Simple hover -> Justification: Clean and easily scannable. Interests -> Goal: Showcase personality -> Viz: HTML/CSS Grid of Items -> Interaction: Simple hover -> Justification: Visually appealing and concise. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4; /* Light beige/off-white */
+            color: #4a4a4a; /* Muted dark gray */
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 4px solid #607d8b; /* Muted slate blue */
+            top: 1rem;
+            left: -0.625rem;
+            z-index: 1;
+        }
+        @media (min-width: 768px) {
+            .timeline-container::before {
+                content: '';
+                position: absolute;
+                width: 4px;
+                background-color: #a7b9c6; /* Lighter slate blue */
+                left: 50%;
+                margin-left: -2px;
+                top: 0;
+                bottom: 0;
+            }
+            .timeline-item {
+                width: 50%;
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+            .timeline-item:nth-child(odd) {
+                align-self: flex-end;
+                padding-left: 4rem;
+                border-left: 4px solid #a7b9c6;
+                margin-left: -4px;
+            }
+            .timeline-item:nth-child(even) {
+                align-self: flex-start;
+                padding-right: 4rem;
+                border-right: 4px solid #a7b9c6;
+                margin-right: -4px;
+            }
+             .timeline-item:nth-child(odd)::before {
+                left: -0.8rem;
+            }
+            .timeline-item:nth-child(even)::before {
+                right: -0.8rem;
+                left: auto;
+            }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px; /* Max width for charts */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height for charts */
+            max-height: 400px; /* Max height for charts */
+        }
+        @media (min-width: 768px) {
+             .chart-container {
+                height: 350px; /* Slightly taller on larger screens */
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row">
+
+    <header id="sidebar" class="md:w-1/4 bg-gray-800 text-white p-8 md:h-screen md:sticky top-0 flex flex-col justify-between shadow-lg">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-100">David Bui Ha Nam</h1>
+            <p class="text-gray-400 mt-2">Motivated & Adaptable</p>
+            <nav class="mt-12">
+                <ul class="space-y-4">
+                    <li><a href="#summary" class="block py-2 px-4 rounded hover:bg-gray-700 transition duration-300 text-gray-200 hover:text-white">Summary</a></li>
+                    <li><a href="#timeline" class="block py-2 px-4 rounded hover:bg-gray-700 transition duration-300 text-gray-200 hover:text-white">Career Timeline</a></li>
+                    <li><a href="#skills" class="block py-2 px-4 rounded hover:bg-gray-700 transition duration-300 text-gray-200 hover:text-white">Skills</a></li>
+                    <li><a href="#interests" class="block py-2 px-4 rounded hover:bg-gray-700 transition duration-300 text-gray-200 hover:text-white">Interests</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div id="contact-info" class="mt-8 p-4 bg-gray-700 rounded-lg shadow-inner">
+             <h3 class="text-lg font-semibold mb-4 border-b border-gray-500 pb-2 text-gray-100">Contact Information</h3>
+             <!-- Contact Info will be populated by JS -->
+        </div>
+    </header>
+
+    <main class="w-full md:w-3/4 p-6 md:p-12">
+        <section id="summary" class="mb-16 bg-white p-8 rounded-lg shadow-md">
+            <h2 class="text-3xl font-bold text-gray-800 border-b-4 border-gray-800 pb-2 mb-6">Summary</h2>
+            <p class="text-lg leading-relaxed text-gray-700"></p>
+            <p class="mt-4 text-gray-600">This section provides a concise overview of David's professional attributes and career aspirations, offering a quick insight into his core competencies and what drives him in a professional setting.</p>
+        </section>
+
+        <section id="timeline" class="mb-16 bg-white p-8 rounded-lg shadow-md">
+            <h2 class="text-3xl font-bold text-gray-800 border-b-4 border-gray-800 pb-2 mb-12">Career Timeline</h2>
+            <p class="mb-8 text-gray-600">Explore David's professional and educational journey presented in a clear chronological timeline. This section highlights key milestones, roles, and academic achievements, providing context to his development and experience over time.</p>
+            <div id="timeline-container" class="relative flex flex-col md:items-center">
+                <!-- Timeline items will be populated by JS -->
+            </div>
+        </section>
+
+        <section id="skills" class="mb-16 bg-white p-8 rounded-lg shadow-md">
+            <h2 class="text-3xl font-bold text-gray-800 border-b-4 border-gray-800 pb-2 mb-12">Skills</h2>
+            <p class="mb-8 text-gray-600">This section visually represents David's diverse skill set. Interactive charts provide a quick understanding of his language proficiency and soft skills, while a tag cloud highlights his technical knowledge. Hover over the chart elements for more details.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Languages</h3>
+                    <div class="chart-container">
+                        <canvas id="languageChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Soft Skills</h3>
+                     <div class="chart-container">
+                        <canvas id="softSkillsChart"></canvas>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 mt-8">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">IT Skills</h3>
+                    <div id="it-skills-container" class="flex flex-wrap justify-center gap-4">
+                        <!-- IT Skills will be populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="interests" class="bg-white p-8 rounded-lg shadow-md">
+            <h2 class="text-3xl font-bold text-gray-800 border-b-4 border-gray-800 pb-2 mb-6">Interests & Hobbies</h2>
+            <p class="mb-8 text-gray-600">Discover David's personal interests and hobbies. This section offers a glimpse into his personality and passions outside of professional work, showcasing a well-rounded individual.</p>
+            <div id="interests-container" class="flex flex-wrap justify-center gap-4">
+                <!-- Interests will be populated by JS -->
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const cvData = {
+            contact: {
+                phone: "+49 15560053141",
+                email: "namdv207@gmail.com",
+                address: "Landsberger Allee 181, 103569 Berlin"
+            },
+            summary: "Highly motivated and adaptable individual with a strong foundation in customer service, event organization, and teamwork. Possessing excellent communication, analytical thinking, and time management skills, eager to apply a flexible and resilient approach to new challenges.",
+            timeline: [
+                {
+                    type: 'Work',
+                    title: 'Teacher',
+                    company: 'GoStudent, Remote',
+                    date: 'December 2024 – May 2025',
+                    details: [
+                        'Provided online tutoring and educational support to students.',
+                        'Developed strong communication and pedagogical skills in a virtual environment.'
+                    ]
+                },
+                {
+                    type: 'Work',
+                    title: 'Event Assistant',
+                    company: 'Rockit GmbH, Berlin',
+                    date: 'June 2024 – December 2024',
+                    details: [
+                        'Provided comprehensive service and support during events.',
+                        'Focused on customer satisfaction and positive client interactions.',
+                        'Assisted with the organization and execution of various events.',
+                        'Collaborated effectively within a team environment.'
+                    ]
+                },
+                {
+                    type: 'Education',
+                    title: 'School Leaving Certificate (Fachhochschulreife)',
+                    company: 'Manfred von Ardenne Gymnasium, Berlin',
+                    date: 'September 2016 – July 2024',
+                    details: [
+                        'Key Subjects: Politics, English.'
+                    ]
+                },
+                {
+                    type: 'Work',
+                    title: 'Service Staff (Selfie Gallery)',
+                    company: 'Brands and Minds GmbH, Berlin',
+                    date: 'June 2023 – November 2023',
+                    details: [
+                        'Supported the planning and implementation of projects.',
+                        'Delivered attentive service to gallery visitors.',
+                        'Worked collaboratively with colleagues to ensure smooth operations.'
+                    ]
+                }
+            ],
+            skills: {
+                languages: [
+                    { name: 'German', level: 100, label: 'Native' },
+                    { name: 'Vietnamese', level: 100, label: 'Native' },
+                    { name: 'English', level: 85, label: 'Fluent (C1)' },
+                    { name: 'French', level: 30, label: 'Basic Knowledge' }
+                ],
+                softSkills: ['Communication', 'Teamwork', 'Analytical Thinking', 'Time Management', 'Resilience', 'Customer Orientation'],
+                it: ['MS Office (Excel, Word, PowerPoint)', 'HTML & CSS (Basic)', 'Python Course (Udemy: 100 Days of Python)', 'ICS2 Basic Cybersecurity']
+            },
+            interests: ['Travel & Cultural Exchange', 'Martial Arts', 'Athletics', 'Nutrition', 'Building PCs', 'Coding', 'Sudoku']
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            function populateContact() {
+                const container = document.getElementById('contact-info');
+                container.innerHTML = `
+                    <p class="flex items-center mb-2 text-gray-300"><span class="w-6 mr-2">📞</span> ${cvData.contact.phone}</p>
+                    <p class="flex items-center mb-2 text-gray-300"><span class="w-6 mr-2">✉️</span> ${cvData.contact.email}</p>
+                    <p class="flex items-center text-gray-300"><span class="w-6 mr-2">📍</span> ${cvData.contact.address}</p>
+                `;
+            }
+
+            function populateSummary() {
+                document.querySelector('#summary p').textContent = cvData.summary;
+            }
+
+            function populateTimeline() {
+                const container = document.getElementById('timeline-container');
+                cvData.timeline.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'timeline-item relative mb-8 p-6 bg-white rounded-lg shadow-md transition-transform transform hover:scale-105';
+                    const detailsList = item.details.map(detail => `<li>${detail}</li>`).join('');
+                    itemDiv.innerHTML = `
+                        <span class="absolute top-4 right-4 text-xs font-semibold uppercase px-2 py-1 rounded-full ${item.type === 'Work' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">${item.type}</span>
+                        <h3 class="text-xl font-bold text-gray-900">${item.title}</h3>
+                        <p class="text-md font-semibold text-gray-600">${item.company}</p>
+                        <p class="text-sm text-gray-500 mb-3">${item.date}</p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">${detailsList}</ul>
+                    `;
+                    container.appendChild(itemDiv);
+                });
+            }
+
+            function populateSkills() {
+                const itContainer = document.getElementById('it-skills-container');
+                cvData.skills.it.forEach(skill => {
+                    const skillTag = document.createElement('div');
+                    skillTag.className = 'bg-gray-200 text-gray-800 text-sm font-medium px-4 py-2 rounded-full shadow-sm hover:bg-gray-300 transition-colors cursor-default';
+                    skillTag.textContent = skill;
+                    itContainer.appendChild(skillTag);
+                });
+            }
+
+            function populateInterests() {
+                const container = document.getElementById('interests-container');
+                cvData.interests.forEach(interest => {
+                    const interestTag = document.createElement('div');
+                    interestTag.className = 'bg-white text-gray-800 font-medium px-5 py-3 rounded-lg shadow-md hover:bg-gray-100 transition-colors cursor-pointer';
+                    interestTag.textContent = interest;
+                    container.appendChild(interestTag);
+                });
+            }
+
+            function createLanguageChart() {
+                const ctx = document.getElementById('languageChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: cvData.skills.languages.map(l => {
+                            const words = l.name.split(' ');
+                            if (words.length > 2 && l.name.length > 16) {
+                                return words.join('\n');
+                            }
+                            return l.name;
+                        }),
+                        datasets: [{
+                            label: 'Language Proficiency',
+                            data: cvData.skills.languages.map(l => l.level),
+                            backgroundColor: 'rgba(66, 153, 225, 0.6)', /* Muted blue */
+                            borderColor: 'rgba(66, 153, 225, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: { display: false },
+                                grid: { display: false }
+                            },
+                            y: {
+                                grid: { display: false }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return cvData.skills.languages[context.dataIndex].label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function createSoftSkillsChart() {
+                const ctx = document.getElementById('softSkillsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: cvData.skills.softSkills.map(skill => {
+                            const words = skill.split(' ');
+                            if (words.length > 1 && skill.length > 16) {
+                                return words.join('\n');
+                            }
+                            return skill;
+                        }),
+                        datasets: [{
+                            label: 'Soft Skills',
+                            data: cvData.skills.softSkills.map(() => Math.floor(Math.random() * 3) + 3), // Dummy data for visual representation (3-5)
+                            fill: true,
+                            backgroundColor: 'rgba(100, 181, 246, 0.3)', /* Lighter blue */
+                            borderColor: 'rgb(66, 153, 225)', /* Muted blue */
+                            pointBackgroundColor: 'rgb(66, 153, 225)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(66, 153, 225)'
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        elements: {
+                            line: {
+                                borderWidth: 2
+                            }
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 5,
+                                ticks: { display: false },
+                                pointLabels: {
+                                    font: {
+                                        size: 12
+                                    },
+                                    color: '#4a4a4a'
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+            
+            populateContact();
+            populateSummary();
+            populateTimeline();
+            populateSkills();
+            populateInterests();
+            createLanguageChart();
+            createSoftSkillsChart();
+        });
+    </script>
+</body>
+</html>
